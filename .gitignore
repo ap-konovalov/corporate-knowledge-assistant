@@ -1,0 +1,19 @@
+# --- Документы и векторная база: не публикуем ---
+data/raw/*
+!data/raw/.gitkeep
+data/qdrant/
+
+# --- Секреты ---
+.env
+
+# --- Служебные файлы Python ---
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# --- Мусор macOS и редакторов ---
+.DS_Store
+.idea/
+.vscode/
+.kilo/
