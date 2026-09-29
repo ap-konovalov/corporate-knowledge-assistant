@@ -1,0 +1,31 @@
+[project]
+name = "kb-assistant"
+version = "0.1.0"
+description = "Корпоративный ассистент: ответы по базе документов со ссылками на источники"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pymupdf>=1.24",              # чтение PDF: текст, номера страниц, размер шрифта
+    "beautifulsoup4>=4.12",       # чтение HTML: текст и заголовки
+    "langchain-text-splitters>=0.3",  # нарезка текста на кусочки
+    "sentence-transformers>=3.0", # локальная модель эмбеддингов
+    "qdrant-client>=1.12",        # подключение к Qdrant
+    "httpx>=0.27",                # HTTP-запросы к API YandexGPT
+    "pydantic-settings>=2.4",     # настройки из файла .env с проверкой типов
+    "pyyaml>=6.0",                # чтение файла с тестовыми вопросами
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",                # автотесты
+    "ruff>=0.6",                  # проверка стиля кода
+]
+
+# «сборщик». Он превращает папку src/kb_assistant в устанавливаемый пакет. Благодаря этому 
+# скрипты из scripts/ смогут писать import kb_assistant, откуда бы их ни запустили.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kb_assistant"]
