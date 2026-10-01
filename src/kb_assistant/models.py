@@ -27,7 +27,7 @@ class SourceMeta:
 
 @dataclass(frozen=True)
 class Section:
-    """Фрагмент документа (страница) после загрузки, до нарезки на чанки."""
+    """Фрагмент документа после загрузки, до нарезки на чанки."""
 
     text: str
     meta: SourceMeta
@@ -39,7 +39,23 @@ class Chunk:
 
     text: str
     meta: SourceMeta
-    chunk_index: int                # порядковый номер chunk в документе
+    # chunk_index - порядковый номер chunk в документе , нужен чтобы сгенерировать id чанка 
+    # чтобы. Иначе автосгенереный id всегда будет новый при индексации и в базе
+    # будуд одинаковые чанки.
+    chunk_index: int
+    
+    @property
+    def embedding_text(self) -> str:
+        """Добавляем к тексту чанк заголовок если его там нет"""
+        # Длинный раздел режется на несколько чанков, и заголовок есть только в первом. 
+        # поиск по чанкам может не найти подходящий потому нет заголовка. 
+        # при векторизации приклеим к каждому чанку заголовок его раздела. 
+        # Сам текст чанка не меняется: заголовок добавляется только в то, что превращается в вектор. 
+        # Приём называют контекстными заголовками чанков (contextual chunk headers).
+        header = self.meta.header
+        if header and not self.text.startswith(header):
+            return f"{header}\n{self.text}"
+        return self.text                
 
 
 @dataclass(frozen=True)
