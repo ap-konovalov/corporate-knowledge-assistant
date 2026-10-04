@@ -1,0 +1,46 @@
+# Тестовые вопросы для оценки ассистента.
+#   type             — тип проверки
+#   expect_refusal   — должен ли ассистент ответить «Я не знаю»
+#   expected_sources — файлы, на которые ожидаются ссылки в ответе
+
+- id: direct
+  type: Прямой вопрос
+  question: Что определяет программа тестирования (испытаний) СИИ?
+  expect_refusal: false
+  expected_sources: [gost_r_59898_2021.pdf]
+
+- id: aggregation_pdf
+  type: Агрегация (взять чанки из двух файлов базы знаний)
+  question: Как оценка качества связана с жизненным циклом системы ИИ и чем обеспечение качества систем ИИ отличается от обычного ПО?
+  expect_refusal: false
+  expected_sources: [gost_r_59898_2021.pdf, gost_r_71539_2024.pdf]
+
+- id: aggregation_wiki
+  type: Агрегация (две Wiki-статьи)
+  question: Что такое галлюцинации языковых моделей и как RAG помогает с ними бороться?
+  expect_refusal: false
+  expected_sources: [wiki_hallucination.html, wiki_rag.html]
+
+- id: out_of_domain
+  type: Провокация (вне базы)
+  question: Как приготовить борщ?
+  expect_refusal: true
+  expected_sources: []
+
+- id: near_domain
+  type: Провокация (рядом с темой)
+  question: Сколько стоит сертификация системы ИИ по ГОСТ Р 59898-2021?
+  expect_refusal: true
+  expected_sources: []
+
+- id: fake_page
+  type: Ловушка (несуществующая страница)
+  question: Что написано на странице 99 ГОСТ Р 59898-2021?
+  expect_refusal: true
+  expected_sources: []
+
+- id: long_answer
+  type: Длинный ответ
+  question: Перечисли технические процессы жизненного цикла системы ИИ по ГОСТ Р 71539-2024 и кратко опиши каждый.
+  expect_refusal: false
+  expected_sources: [gost_r_71539_2024.pdf]
