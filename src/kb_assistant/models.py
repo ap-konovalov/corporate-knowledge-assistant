@@ -20,7 +20,7 @@ class SourceMeta:
 
     @property
     def citation(self) -> str:
-        """Ссылка в формате из задания."""
+        """Отформатированная ссылка."""
         if self.doc_type == "pdf":
             return f"[{self.source}, стр. {self.page}]"
         return f"[{self.title}]"
