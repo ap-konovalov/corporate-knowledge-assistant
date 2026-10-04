@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     chunk_size: int = Field(default=800, gt=0)
     chunk_overlap: int = Field(default=100, ge=0)
     top_k: int = Field(default=4, ge=1, le=20)
+    min_score: float = Field(default=0.0, ge=0.0, le=1.0)
 
     # Пути
     raw_data_dir: Path = Path("data/raw")
