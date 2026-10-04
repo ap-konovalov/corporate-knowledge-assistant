@@ -18,6 +18,8 @@ MAX_HEADER_LEN = 120
 TOP_MARGIN = 0.08     # верхние 8 % высоты страницы — колонтитул (шифр ГОСТа)
 BOTTOM_MARGIN = 0.12  # нижние 12 % — номер страницы и служебные надписи
 BOLD_FLAG = 16        # признак «жирный шрифт» в PyMuPDF
+SOFT_HYPHEN = "\xad"  # мягкий перенос: невидимый знак «слово перенесено»
+UNNUMBERED_HEADERS = {"Предисловие", "Введение", "Библиография"}
 
 
 class Line(NamedTuple):
@@ -92,14 +94,23 @@ def _find_printed_number(margin_lines: list[str]) -> str | None:
 
 
 def _is_header(line: Line) -> bool:
-    """Заголовок = жирная строка с номером раздела, не из оглавления."""
+    """Заголовок = жирная строка: «Введение» и т. п. либо номер раздела не из оглавления."""
+    if not line.bold:
+        return False
+    if line.text in UNNUMBERED_HEADERS:
+        return True
     return (
-        line.bold
-        and len(line.text) <= MAX_HEADER_LEN
+        len(line.text) <= MAX_HEADER_LEN
         and not TOC_LEADER_RE.search(line.text)
         and HEADER_RE.match(line.text) is not None
     )
 
 
 def _make_section(lines: list[str], header: str | None, meta: dict) -> Section:
-    return Section(text="\n".join(lines), meta=SourceMeta(header=header, **meta))
+    return Section(text=_join_lines(lines), meta=SourceMeta(header=header, **meta))
+
+
+def _join_lines(lines: list[str]) -> str:
+    """Склеить строки; слова, разорванные мягким переносом, собрать обратно."""
+    text = "\n".join(lines)
+    return text.replace(SOFT_HYPHEN + "\n", "").replace(SOFT_HYPHEN, "")

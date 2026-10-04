@@ -14,6 +14,7 @@ def chunk_sections(sections: list[Section], chunk_size: int, chunk_overlap: int)
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         separators=SEPARATORS,
+        keep_separator="end",
     )
     chunks: list[Chunk] = []
     next_index: dict[str, int] = {}  # словарь «имя файла → номер следующего чанка», для каждого файла чанки нумеруем 0,1..
