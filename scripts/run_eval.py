@@ -84,7 +84,7 @@ def render_report(results: list[EvalResult], settings: Settings) -> str:
         f"- LLM: `{settings.llm_model}` (версия {', '.join(versions) or '—'}), temperature={settings.llm_temperature}",
         f"- Эмбеддинги: `{settings.embedding_model}`",
         f"- Нарезка и поиск: chunk_size={settings.chunk_size}, overlap={settings.chunk_overlap}, "
-        f"top_k={settings.top_k}, min_score={settings.min_score}",
+        f"top_k={settings.top_k}, min_score={settings.min_score}, max_per_source={settings.max_per_source}",
         "",
         f"**Итог: пройдено {passed} из {len(results)}.**",
         "",

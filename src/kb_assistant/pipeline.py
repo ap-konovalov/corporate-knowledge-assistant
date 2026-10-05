@@ -11,8 +11,10 @@ from kb_assistant.llm import LLMClient, create_llm
 from kb_assistant.models import SearchResult
 from kb_assistant.prompts import NO_ANSWER, SYSTEM_PROMPT, build_user_prompt
 from kb_assistant.vectorstore import VectorStore
+from kb_assistant.retrieval import diversify
 
 logger = logging.getLogger(__name__)
+CANDIDATE_MULTIPLIER = 5  # чанков из Qdrant берём втрое больше top_k, чтобы было из чего выбирать
 
 
 @dataclass(frozen=True)
@@ -40,12 +42,14 @@ class Assistant:
         llm: LLMClient,
         top_k: int,
         min_score: float,
+        max_per_source: int,
     ) -> None:
         self._embedder = embedder
         self._store = store
         self._llm = llm
         self._top_k = top_k
         self._min_score = min_score
+        self._max_per_source = max_per_source
 
     @classmethod
     def from_settings(cls, settings: Settings) -> "Assistant":
@@ -56,12 +60,14 @@ class Assistant:
             llm=create_llm(settings),
             top_k=settings.top_k,
             min_score=settings.min_score,
+            max_per_source=settings.max_per_source,
         )
 
     def ask(self, question: str) -> Answer:
         """Ответить на вопрос сотрудника."""
         started = time.perf_counter()
-        sources = self._store.search(self._embedder.embed_query(question), self._top_k)
+        candidates = self._store.search(self._embedder.embed_query(question), self._top_k * CANDIDATE_MULTIPLIER)
+        sources = diversify(candidates, self._top_k, self._max_per_source)
         # если RAG база вернула ответ, берем самый первый чанк (Qdrant возвращает результаты от самого похожего к наименее похожему)
         best_score = sources[0].score if sources else 0.0
 
